@@ -97,7 +97,7 @@
     <script src="uStates.js"></script> <!-- creates uStates. -->
 
     <!-- Loading all of the required libraries-->
-    
+
     <script src="https://d3js.org/d3.v3.min.js"></script>
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="https://d3js.org/d3-array.v1.min.js"></script>
@@ -293,7 +293,7 @@
         //updates the data including the axis and lines in the chart when a new state is clicked on or removed
         function updateData(state, active) {
             var max = 1000;
-            //console.log(state + " " + active);
+            console.log(state + " " + active);
 
             TotalData.forEach(function(d, i) {
                 //checks to see if the state is now active or diabled 
@@ -451,6 +451,7 @@
                 .attr('x2', x(drawLine))
                 .attr('y1', 0)
                 .attr('y2', height);
+            var FullState;
             //draws the box as the correct mouse location but 20 pixels ofset to not get in the way of the mouse
             tooltip.html(year)
                 .style('display', 'block')
@@ -461,9 +462,17 @@
                 .data(currentData).enter()
                 .append('div')
                 .style('color', d => d.color)
-                .html(d => d.values[0].State + ': ' + d.values.find(function(element) {
+                .html(d =>uStatePaths.find(function(e) {
+
+                        if (e.id == d.values[0].State) {
+                            //console.log(e.n + " " + element.State);
+                            return e.n + '';
+                        }
+                    }).n + ": "+ d.values.find(function(element) {
+                    //console.log(state);
                     var tmp = (element.Year) + "";
                     if (tmp.split(" ")[3] == year)
+                        
                         return element;
                 }).Value);
 

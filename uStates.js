@@ -1,6 +1,7 @@
+var uStatePaths;
 (function () {
     //the paths of the states for the states map
-    var uStatePaths = [
+    uStatePaths = [
         {
             id: "HI",
             n: "Hawaii",
