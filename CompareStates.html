@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+    .state {
+        fill: none;
+        stroke: #a9a9a9;
+        stroke-width: 1;
+    }
+
+    .state:hover {
+        fill-opacity: 0.5;
+    }
+
+    #tooltip {
+        position: absolute;
+        text-align: center;
+        padding: 20px;
+        margin: 10px;
+        font: 12px sans-serif;
+        background: lightsteelblue;
+        border: 1px;
+        border-radius: 2px;
+        pointer-events: none;
+    }
+
+    #tooltip h4 {
+        margin: 0;
+        font-size: 14px;
+    }
+
+    #tooltip {
+        background: rgba(0, 0, 0, 0.9);
+        border: 1px solid grey;
+        border-radius: 5px;
+        font-size: 12px;
+        width: auto;
+        padding: 4px;
+        color: white;
+        opacity: 0;
+    }
+
+    #tooltip table {
+        table-layout: fixed;
+    }
+
+    #tooltip tr td {
+        padding: 0;
+        margin: 0;
+    }
+
+    #tooltip tr td:nth-child(1) {
+        width: 50px;
+    }
+
+    #tooltip tr td:nth-child(2) {
+        text-align: center;
+    }
+
+    body {
+        background-color: lightslategray;
+    }
+
+</style>
+<style type="text/css">
+    /* 13. Basic Styling with CSS */
+
+    /* Style the lines by removing the fill and applying a stroke */
+    .line {
+        fill: none;
+        stroke: #ffab00;
+        stroke-width: 3;
+    }
+
+    .overlay {
+        fill: none;
+        pointer-events: all;
+    }
+
+    /* Style the dots by assigning a fill and stroke */
+    .dot {
+        fill: #ffab00;
+        stroke: #fff;
+    }
+
+    .focus circle {
+        fill: none;
+        stroke: steelblue;
+    }
+
+</style>
+
+<body>
+    <h1 style="text-align: center">Number Of Assaults on Police Officers</h1>
+    <div id="tooltip"></div><!-- div to hold tooltip. -->
+    <div id='tooltip2' style='position:absolute;background-color:lightgray;padding:5px'></div>
+    <svg width="960" height="600" id="statesvg"></svg> <!-- svg to hold the map. -->
+    <script src="uStates.js"></script> <!-- creates uStates. -->
+
+    <!-- Loading all of the required libraries-->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://d3js.org/d3.v4.min.js"></script>
+    <script src="https://d3js.org/d3-array.v1.min.js"></script>
+    <script src="https://d3js.org/d3-collection.v1.min.js"></script>
+    <script src="https://d3js.org/d3-color.v1.min.js"></script>
+    <script src="https://d3js.org/d3-format.v1.min.js"></script>
+    <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
+    <script src="https://d3js.org/d3-time.v1.min.js"></script>
+    <script src="https://d3js.org/d3-time-format.v2.min.js"></script>
+    <script src="https://d3js.org/d3-scale.v2.min.js"></script>
+    <script src="https://d3js.org/d3-path.v1.min.js"></script>
+    <script src="http://d3js.org/d3.v4.0.0-alpha.44.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+
+    <!-- The Script for writing the map of the states-->
+    <script>
+        function tooltipHtml(n, d) {
+            /* function to create html content string in tooltip div of the states map. */
+            return "<h4>" + n + "</h4>";
+        }
+
+        var sampleData = {}; /* creating the states map. */
+        ["HI", "AK", "FL", "SC", "GA", "AL", "NC", "TN", "RI", "CT", "MA",
+            "ME", "NH", "VT", "NY", "NJ", "PA", "DE", "MD", "WV", "KY", "OH",
+            "MI", "WY", "MT", "ID", "WA", "DC", "TX", "CA", "AZ", "NV", "UT",
+            "CO", "NM", "OR", "ND", "SD", "NE", "IA", "MS", "IN", "IL", "MN",
+            "WI", "MO", "AR", "OK", "KS", "LS", "VA"
+        ]
+        .forEach(function(d) {
+            sampleData[d] = {
+                color: "#ffffff"
+            };
+        });
+
+        /* draw states on id #statesvg */
+        uStates.draw("#statesvg", sampleData, tooltipHtml);
+
+        d3.select(self.frameElement).style("height", "600px");
+
+    </script>
+
+    <!-- the script for writing the line chart-->
+    <script>
+        var TotalData;
+        // Set the dimensions of the canvas / graph
+        var margin = {
+                top: 30,
+                right: 20,
+                bottom: 70,
+                left: 50
+            },
+            width = 800,
+            height = 600;
+        // Parse the date / time
+        var parseDate = d3.time.format("%Y").parse;
+        // Set the ranges
+        var x = d3.time.scale().range([0, width]);
+        var y = d3.scale.linear().range([height, 0]);
+
+        //sets the max and min for the axis
+        var yScale = d3.scaleLinear()
+            .domain([0, 1000])
+            .range([height, 0]);
+        var xScale = d3.scaleLinear()
+            .domain([1995, 2017])
+            .range([0, width]);
+
+        // Define the axes
+        var xAxis = d3.svg.axis().scale(x)
+            .orient("bottom").ticks(12);
+        var yAxis = d3.svg.axis().scale(y)
+            .orient("left").ticks(12);
+
+        function make_x_gridlines() {
+            return d3.axisBottom(x)
+                .ticks(12)
+        }
+
+        // gridlines in y axis function
+        function make_y_gridlines() {
+            return d3.axisLeft(y)
+                .ticks(10)
+        }
+
+        // Define the line
+        var priceline = d3.svg.line()
+            .x(function(d) {
+                return x(d.Year);
+            })
+            .y(function(d) {
+                return y(d.Value);
+            });
+
+        //defines the colors for the states
+        var color = d3.scale.category20();
+        setColors(color);
+
+        // Adds the svg canvas
+        var svg = d3.select("body")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform",
+                "translate(" + margin.left + "," + margin.top + ")");
+        // Get the data
+        d3.csv("FinalData.csv", function(error, data) {
+            data.forEach(function(d) {
+                d.Year = parseDate(d.Year);
+                d.Value = +d.Value;
+            });
+            // Scale the range of the data
+            x.domain(d3.extent(data, function(d) {
+                return d.Year;
+            }));
+            y.domain([0, d3.max(data, function(d) {
+                return d.Value;
+            })]);
+            // Nest the entries by symbol
+            var dataNest = d3.nest()
+                .key(function(d) {
+                    return d.State;
+                })
+                .entries(data);
+
+            // Loop through each symbol / key
+            dataNest.forEach(function(d, i) {
+                svg.append("path")
+                    .attr("class", "line")
+                    .style("stroke", function() { // Add the colours dynamically
+                        return d.color = color(d.key);
+                    })
+                    .attr("id", 'tag' + d.key.replace(/\s+/g, '')) // assign ID
+                    .attr("d", priceline(d.values));
+                // Add the Legend
+
+                // Determine if current line is visible 
+                var active = true,
+                    newOpacity = active ? 0 : 1;
+                // Hide or show the elements based on the ID
+                d3.select("#tag" + d.key.replace(/\s+/g, ''))
+                    .transition().duration(10)
+                    .style("opacity", newOpacity);
+                // Update whether or not the elements are active
+                d.active = false;
+            });
+            // Add the X Axis
+            svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(xScale));
+            // Add the Y Axis
+            svg.append("g")
+                .attr("class", "y axis")
+                .call(d3.axisLeft(yScale));
+            TotalData = dataNest;
+            // add the X gridlines
+            svg.append("g")
+                .attr("class", "grid")
+                .attr("transform", "translate(0," + height + ")")
+                .call(make_x_gridlines()
+                    .tickSize(-height)
+                    .tickFormat("")
+                )
+
+            // add the Y gridlines
+            svg.append("g")
+                .attr("class", "grid")
+                .call(make_y_gridlines()
+                    .tickSize(-width)
+                    .tickFormat("")
+                )
+        });
+
+        //the currently visible data for the chart
+        var currentData = [];
+        //the current max of the y axis
+        var currentMax = 0;
+
+        //finds and removes the correct object from the current data list and changes the current data array
+        function findPosition(value) {
+            var removed = [];
+            for (var x = 0; x < currentData.length; x++) {
+                if (currentData[x].key == value) {
+
+                } else {
+                    removed.push(currentData[x]);
+                }
+            }
+            currentData = removed;
+        }
+
+        //updates the data including the axis and lines in the chart when a new state is clicked on or removed
+        function updateData(state, active) {
+            var max = 1000;
+            //console.log(state + " " + active);
+
+            TotalData.forEach(function(d, i) {
+                //checks to see if the state is now active or diabled 
+                if (active && d.key == state) {
+                    var newOpacity = 1;
+
+
+                    // Hide or show the elements based on the ID
+                    d3.select("#tag" + d.key.replace(/\s+/g, ''))
+                        .transition().duration(1000)
+                        .style("opacity", newOpacity);
+                    // Update whether or not the elements are active
+                    d.active = active;
+                    currentData.push(d);
+                }
+                if (!active && d.key == state) {
+                    var newOpacity = 0
+                    // Hide or show the elements based on the ID
+                    d3.select("#tag" + d.key.replace(/\s+/g, ''))
+                        .transition().duration(1000)
+                        .style("opacity", newOpacity);
+                    // Update whether or not the elements are active
+                    d.active = active;
+                    findPosition(state);
+
+                }
+                //finds the new max of the current set of data
+                if (d.active) {
+                    var temp = findNewMax(d.values);
+                    if (temp > max) {
+                        max = temp;
+                        currentMax = max;
+                    }
+                }
+
+            });
+            //scale the y axis correctly
+            y = d3.scale.linear().range([height, 0]);
+            y.domain([0, max]);
+
+            yScale = d3.scaleLinear()
+                .domain([0, max]) // input 
+                .range([height, 0]);
+
+            yAxis = d3.svg.axis().scale(y)
+                .orient("left").ticks(10);
+            //removes the old scaling with the new one
+            svg.selectAll(".y.axis").remove();
+            svg.append("g")
+                .attr("class", "y axis")
+                .call(d3.axisLeft(yScale));
+            //removes the old lines and adds the new ones with the proper scaling
+            svg.selectAll(".line").remove();
+
+            TotalData.forEach(function(d, i) {
+                if (d.active) {
+                    svg.append("path")
+                        .attr("class", "line")
+                        .style("stroke", function() { // Add the colours dynamically
+                            return d.color = color(d.key);
+                        })
+                        .attr("id", 'tag' + d.key.replace(/\s+/g, '')) // assign ID
+                        .attr("d", priceline(d.values));
+                }
+            });
+        }
+
+        //finds the new max based on the currently visible data. defaults to 1000 if nothing is selected or the values are less than 1000
+        function findNewMax(values) {
+            var max = 0;
+            values.forEach(function(d) {
+                if (d.Value > max)
+                    max = d.Value;
+            });
+            return max;
+        }
+
+        //tool tip and line declaration
+        const tooltip = d3.select('#tooltip2');
+        const tooltipLine = svg.append('line');
+
+        //sets up the tooltip
+        function ToolTipSetup() {
+            const margin = {
+                top: 0,
+                right: 0,
+                bottom: -400,
+                left: 0
+            };
+            const width = 800 - margin.left - margin.right;
+            const height = 400 - margin.top - margin.bottom;
+            const x = d3.scaleLinear().domain([1995, 2017]).range([0, width]);
+            const y = d3.scaleLinear().domain([0, currentMax]).range([height, 0]);
+            const line = d3.line().x(d => x(d.Year)).y(d => y(d.Value));
+
+
+            //sets the line up for the chart wherever the mouse is located on the chart
+            svg.selectAll()
+                .data(currentData).enter()
+                .append('path')
+                .attr('fill', 'none')
+                .attr('stroke', d => d.color)
+                .attr('stroke-width', 2)
+                .datum(d => d.Year)
+                .attr('d', line);
+
+            //sets up the tooltip box that follows just to the right and down of the mouse when on the chart
+            tipBox = svg.append('rect')
+                .attr('width', width)
+                .attr('height', height)
+                .attr('opacity', 0)
+                .on('mousemove', drawTooltip)
+                .on('mouseout', removeTooltip);
+        }
+
+        //draw the tooltip helper function 
+        function drawTooltip() {
+            //gets the position of the mouse to get the correct year from it
+            const drawLine = (x.invert(d3.mouse(tipBox.node())[0]));
+            //gets the year that the mouse is located to help draw the line
+            var year = (x.invert(d3.mouse(tipBox.node())[0]) + 1 / 10 * 10).split(" ")[3];
+
+            //sorts the data for the tooltipbox so the data that is the largest is on the top of the tooltip
+            currentData.sort((a, b) => {
+                var aval, bval;
+
+                //gets the data and if nothing is there it is set to 0 so no errors will be thrown
+                try {
+                    bval = b.values.find(function(element) {
+                        var tmp = (element.Year) + "";
+                        if (tmp.split(" ")[3] == year)
+                            return element;
+                    }).Value
+                } catch (err) {
+                    bval = 0;
+                }
+
+                //gets the second value or is set to 0 if there is nothing there so errors will not be thrown
+                try {
+                    aval = a.values.find(function(element) {
+                        var tmp = (element.Year) + "";
+                        if (tmp.split(" ")[3] == year)
+                            return element
+                    }).Value;
+                } catch (err) {
+                    aval = 0;
+                }
+                //returns which one is greater
+                return bval - aval;
+            })
+
+            //draws the line at the correct x axis point
+            tooltipLine.attr('stroke', 'black')
+                .attr('x1', x(drawLine))
+                .attr('x2', x(drawLine))
+                .attr('y1', 0)
+                .attr('y2', height);
+            //draws the box as the correct mouse location but 20 pixels ofset to not get in the way of the mouse
+            tooltip.html(year)
+                .style('display', 'block')
+                .style('left', (d3.event.pageX + 20) + "px")
+                .style('top', (d3.event.pageY - 20) + "px")
+                .style('font-size', "2em")
+                .selectAll()
+                .data(currentData).enter()
+                .append('div')
+                .style('color', d => d.color)
+                .html(d => d.values[0].State + ': ' + d.values.find(function(element) {
+                    var tmp = (element.Year) + "";
+                    if (tmp.split(" ")[3] == year)
+                        return element;
+                }).Value);
+
+        }
+
+        //removes the tooltip and box if the mouse is off the page
+        function removeTooltip() {
+            if (tooltip) tooltip.style('display', 'none');
+            if (tooltipLine) tooltipLine.attr('stroke', 'none');
+        }
+        ToolTipSetup();
+
+    </script>
+</body>
