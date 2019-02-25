@@ -3,12 +3,12 @@
 <style>
     .state {
         fill: none;
-        stroke: #a9a9a9;
+        stroke: white;
         stroke-width: 1;
     }
 
     .state:hover {
-        fill-opacity: 0.5;
+        fill-opacity: .5;
     }
 
     #tooltip {
@@ -57,7 +57,7 @@
     }
 
     body {
-        background-color: lightslategray;
+        background-color: white;
     }
 
 </style>
@@ -92,7 +92,7 @@
 <body>
     <h1 style="text-align: center">Number Of Assaults on Police Officers</h1>
     <div id="tooltip"></div><!-- div to hold tooltip. -->
-    <div id='tooltip2' style='position:absolute;background-color:lightgray;padding:5px'></div>
+    <div id='tooltip2' style='position:absolute;background-color:black;padding:5px; color: white'></div>
     <svg width="960" height="600" id="statesvg"></svg> <!-- svg to hold the map. -->
     <script src="uStates.js"></script> <!-- creates uStates. -->
 
@@ -446,7 +446,7 @@
             })
 
             //draws the line at the correct x axis point
-            tooltipLine.attr('stroke', 'black')
+            tooltipLine.attr('stroke', 'gray')
                 .attr('x1', x(drawLine))
                 .attr('x2', x(drawLine))
                 .attr('y1', 0)
