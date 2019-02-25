@@ -284,10 +284,10 @@ var uStatePaths;
             var color = $(event.target)[0].style.fill;
             var active = true;
             //determines if the color is not white then it is active
-            if (color == "rgb(0, 0, 0)") {
+            if (color == "black") {
                 $(event.target)[0].style.fill = colors(text);
             } else {
-                $(event.target)[0].style.fill = "rgb(0, 0, 0)";
+                $(event.target)[0].style.fill = "black";
                 active = false;
             }
             //updates the data on the graph based on which state was clicked and if it was already active or not
@@ -301,7 +301,7 @@ var uStatePaths;
                 return d.d;
             })
             .style("fill", function (d) {
-                return data[d.id].color = "rgb(0,0,0)";
+                return data[d.id].color = "black";
             })
             .on("mouseover", mouseOver).on("mouseout", mouseOut).on("click", onClick);
     }
