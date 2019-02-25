@@ -295,7 +295,7 @@ var uStatePaths;
         }
         //declares all of the states and draws them on the svg
         d3.select(id).selectAll(".state")
-            .data(uStatePaths).enter().append("path").attr("class", function (d) {
+            .data(uStatePaths).enter().append("path").attr("class", function (d) { 
                 return "state " + d.id;
             }).attr("d", function (d) {
                 return d.d;
